@@ -48,8 +48,15 @@ namespace AssessmentUser.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
-            ViewBag.Roles = new SelectList(Enum.GetValues(typeof(UserRole)));
-            ViewData["ManagerId"] = new SelectList(_context.Users, "Id", "Username");
+            // ViewBag.Roles = new SelectList(Enum.GetValues(typeof(UserRole)));
+            var roles = Enum.GetValues(typeof(UserRole))
+                 .Cast<UserRole>()
+                 .Where(role => role != UserRole.Admin)
+                 .ToList();
+
+            ViewBag.Roles = new SelectList(roles);
+
+            ViewData["ManagerId"] = new SelectList(_context.Users.Where(x=>x.Role==UserRole.Manager), "Id", "Username");
             return View();
         }
 
@@ -118,7 +125,7 @@ namespace AssessmentUser.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             
-            ViewData["ManagerId"] = new SelectList(_context.Users, "Id", "Id", user.ManagerId);
+            ViewData["ManagerId"] = new SelectList(_context.Users, "Id", "Username", user.ManagerId);
             return View(user);
         }
 

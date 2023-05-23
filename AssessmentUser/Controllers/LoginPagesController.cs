@@ -24,25 +24,31 @@ namespace AssessmentUser.Controllers
         }
 
         [HttpPost]
-        
+
         public IActionResult Login(LoginPage model)
         {
 
-            
-            
-            if (model.Username == "admin" && model.Password == "password")
-                {
-                    
-                    return RedirectToAction("Index", "Home"); 
-                }
-                else
-                {
-                    
-                    ModelState.AddModelError("", "Invalid username or password");
-                }
-            
+            ViewBag.Value=model.Username.ToString();
+            ViewBag.Password=model.Password.ToString();
+            string name = ViewBag.Value;
 
-            
+            User user = _context.Users.FirstOrDefault(x=>x.Username==name);
+
+            if (model.Username == name && model.Password == user.Password)
+            {
+                if (user.Role == UserRole.Admin)
+                    return RedirectToAction("", "Users");
+                else if (user.Role == UserRole.Employee)
+                    return RedirectToAction("", "Batches");
+            }
+            else
+            {
+
+                ModelState.AddModelError("", "Invalid username or password");
+            }
+
+
+
             return View(model);
         }
     }
